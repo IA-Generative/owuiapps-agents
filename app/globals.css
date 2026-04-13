@@ -1,0 +1,16 @@
+/* Styles globaux — Tailwind uniquement.
+   Le DSFR est servi comme asset statique depuis public/dsfr/ (copié par
+   le Dockerfile à partir de node_modules/@codegouvfr/react-dsfr/dsfr/),
+   pointé par un <link rel="stylesheet"> dans app/layout.tsx.
+   On ne passe PAS par @import CSS dans ce fichier parce que main.css
+   contient une arborescence d'imports qui fait exploser la pile du
+   css-loader webpack de Next.js ("Maximum call stack size exceeded"). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}

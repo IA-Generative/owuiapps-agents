@@ -1,0 +1,54 @@
+{
+  "clientId": "miraiku-agents",
+  "name": "MirAI Agent Builder",
+  "description": "Application de création d'agents IA pour les agents du ministère",
+  "rootUrl": "https://myagents.fake-domain.name",
+  "adminUrl": "https://myagents.fake-domain.name",
+  "baseUrl": "https://myagents.fake-domain.name",
+  "surrogateAuthRequired": false,
+  "enabled": true,
+  "alwaysDisplayInConsole": false,
+  "clientAuthenticatorType": "client-secret",
+  "secret": "CHANGE_ME_GENERATE_ON_IMPORT",
+  "redirectUris": [
+    "https://myagents.fake-domain.name/api/auth/callback/keycloak",
+    "http://localhost:3001/api/auth/callback/keycloak"
+  ],
+  "webOrigins": [
+    "https://myagents.fake-domain.name",
+    "http://localhost:3001"
+  ],
+  "notBefore": 0,
+  "bearerOnly": false,
+  "consentRequired": false,
+  "standardFlowEnabled": true,
+  "implicitFlowEnabled": false,
+  "directAccessGrantsEnabled": false,
+  "serviceAccountsEnabled": false,
+  "publicClient": false,
+  "frontchannelLogout": true,
+  "protocol": "openid-connect",
+  "attributes": {
+    "oidc.ciba.grant.enabled": "false",
+    "oauth2.device.authorization.grant.enabled": "false",
+    "backchannel.logout.session.required": "true",
+    "backchannel.logout.revoke.offline.tokens": "false",
+    "post.logout.redirect.uris": "https://myagents.fake-domain.name/*##http://localhost:3001/*"
+  },
+  "authenticationFlowBindingOverrides": {},
+  "fullScopeAllowed": true,
+  "nodeReRegistrationTimeout": -1,
+  "defaultClientScopes": [
+    "web-origins",
+    "acr",
+    "profile",
+    "roles",
+    "email"
+  ],
+  "optionalClientScopes": [
+    "address",
+    "phone",
+    "offline_access",
+    "microprofile-jwt"
+  ]
+}

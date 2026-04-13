@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-builder
+  namespace: ${NAMESPACE}
+  labels:
+    app: agent-builder
+spec:
+  type: ClusterIP
+  selector:
+    app: agent-builder
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP

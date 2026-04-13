@@ -1,0 +1,158 @@
+// Schéma Prisma — MirAI Agent Builder
+// Traduction des tables définies en §4 du prompt système.
+// Toutes les tables portent le préfixe ab_ (Agent Builder) pour cohabiter
+// sans conflit avec les schémas d'OpenWebUI et Keycloak sur le même Postgres.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Visibility {
+  private
+  community
+  ministry
+}
+
+enum AgentStatus {
+  draft
+  published
+  submitted
+  validated
+  archived
+}
+
+model Agent {
+  id               String        @id @default(uuid()) @db.Uuid
+  owuiModelId      String        @map("owui_model_id")
+  creatorId        String        @map("creator_id") @db.Uuid
+  creatorDirection String?       @map("creator_direction")
+  visibility       Visibility    @default(private)
+  status           AgentStatus   @default(draft)
+  category         String[]
+  tags             String[]
+  version          Int           @default(1)
+  parentAgentId    String?       @map("parent_agent_id") @db.Uuid
+  qualityScore     Decimal?      @map("quality_score") @db.Decimal(3, 2)
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  versions         AgentVersion[]
+  ratings          Rating[]
+  usageStats       UsageStat[]
+  favorites        Favorite[]
+  siConnectors     SiConnector[]
+  conversations    Conversation[]
+
+  @@index([creatorId])
+  @@index([visibility, status])
+  @@map("ab_agents")
+}
+
+model AgentVersion {
+  id             String   @id @default(uuid()) @db.Uuid
+  agentId        String   @map("agent_id") @db.Uuid
+  version        Int
+  configSnapshot Json     @map("config_snapshot")
+  changelog      String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  agent          Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, version])
+  @@map("ab_agent_versions")
+}
+
+model Rating {
+  id        String   @id @default(uuid()) @db.Uuid
+  agentId   String   @map("agent_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  score     Int      @db.SmallInt
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, userId])
+  @@map("ab_ratings")
+}
+
+model UsageStat {
+  id                 String    @id @default(uuid()) @db.Uuid
+  agentId            String    @map("agent_id") @db.Uuid
+  userId             String    @map("user_id") @db.Uuid
+  conversationsCount Int       @default(0) @map("conversations_count")
+  lastUsedAt         DateTime? @map("last_used_at") @db.Timestamptz
+  tokensConsumed     BigInt    @default(0) @map("tokens_consumed")
+
+  agent              Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("ab_usage_stats")
+}
+
+model Favorite {
+  userId  String @map("user_id") @db.Uuid
+  agentId String @map("agent_id") @db.Uuid
+  folder  String @default("default")
+
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, agentId])
+  @@map("ab_favorites")
+}
+
+model SiConnector {
+  id                  String  @id @default(uuid()) @db.Uuid
+  agentId             String  @map("agent_id") @db.Uuid
+  connectorType       String  @map("connector_type")
+  config              Json
+  credentialsVaultRef String? @map("credentials_vault_ref")
+  enabled             Boolean @default(true)
+
+  agent               Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("ab_si_connectors")
+}
+
+model Conversation {
+  id        String                @id @default(uuid()) @db.Uuid
+  agentId   String                @map("agent_id") @db.Uuid
+  userId    String                @map("user_id") @db.Uuid
+  title     String?
+  createdAt DateTime              @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime              @updatedAt @map("updated_at") @db.Timestamptz
+
+  messages  ConversationMessage[]
+  agent     Agent                 @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([userId, agentId])
+  @@map("ab_conversations")
+}
+
+model ConversationMessage {
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @map("conversation_id") @db.Uuid
+  role           String
+  content        String
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("ab_conversation_messages")
+}
+
+model MailIndex {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  owuiKnowledgeId  String?   @map("owui_knowledge_id")
+  foldersScope     String[]  @map("folders_scope")
+  lastSyncAt       DateTime? @map("last_sync_at") @db.Timestamptz
+  syncStatus       String    @default("idle") @map("sync_status")
+  emailCount       Int       @default(0) @map("email_count")
+
+  @@map("ab_mail_indexes")
+}

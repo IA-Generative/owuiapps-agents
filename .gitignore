@@ -1,0 +1,56 @@
+# --- Secrets ---
+.env
+.env.local
+.env.*.local
+*.secret
+*.pem
+*.key
+secrets/
+keycloak/realm-passwords.local.json
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- K8s rendered ---
+k8s/rendered/
+
+# --- Prisma ---
+prisma/migrations/dev.db*
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- Tests / coverage ---
+coverage/
+playwright-report/
+test-results/
+
+# --- IDE / Claude Code ---
+.vscode/
+.idea/
+.claude/
+*.swp
+
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+.apdisk
+Icon?
+__MACOSX/

@@ -1,0 +1,12 @@
+# Kustomization optionnelle — le script deploy/deploy-k8s.sh utilise envsubst
+# plutôt que kustomize (même pattern que le socle owuicore-main) mais ce
+# fichier est fourni pour ceux qui préfèrent `kubectl apply -k`.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - job-migrate.yaml

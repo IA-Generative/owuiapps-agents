@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-builder
+  namespace: ${NAMESPACE}
+  labels:
+    app: agent-builder
+    app.kubernetes.io/part-of: miraiku
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-builder
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: agent-builder
+    spec:
+      enableServiceLinks: false
+      imagePullSecrets:
+        - name: owui-registry
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+        - name: agent-builder
+          image: ${AGENT_BUILDER_IMAGE}
+          # Always : on re-déploie souvent la même balise ${IMAGE_TAG}=dev
+          # avec un nouveau digest. IfNotPresent ferait garder la vieille
+          # image cachée sur le node. Always force le kubelet à re-checker
+          # le registry à chaque démarrage de pod.
+          imagePullPolicy: Always
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          envFrom:
+            - configMapRef:
+                name: agent-builder-config
+            - secretRef:
+                name: agent-builder-secrets
+          env:
+            # La clé Scaleway est partagée avec le socle — on la référence
+            # directement depuis owui-socle-secrets plutôt que de la
+            # dupliquer dans agent-builder-secrets.
+            - name: SCW_SECRET_KEY_LLM
+              valueFrom:
+                secretKeyRef:
+                  name: owui-socle-secrets
+                  key: SCW_SECRET_KEY_LLM
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          volumeMounts:
+            # readOnlyRootFilesystem=true : on monte des emptyDir partout où
+            # Next.js / Node.js peuvent avoir besoin d'écrire.
+            - name: tmp
+              mountPath: /tmp
+            - name: next-cache
+              mountPath: /app/.next/cache
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: next-cache
+          emptyDir: {}

@@ -1,0 +1,16 @@
+# Variables non-sensibles injectées dans le Deployment via envFrom.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-builder-config
+  namespace: ${NAMESPACE}
+data:
+  NODE_ENV: "production"
+  OWUI_BASE_URL: "${OWUI_BASE_URL}"
+  KEYCLOAK_ISSUER: "${KEYCLOAK_ISSUER}"
+  KEYCLOAK_CLIENT_ID: "miraiku-agents"
+  NEXTAUTH_URL: "https://${AGENTS_HOST}"
+  # --- Scaleway Generative APIs ---
+  SCW_LLM_BASE_URL: "${SCW_LLM_BASE_URL}"
+  SCW_LLM_MODEL: "${SCW_LLM_MODEL}"
+  OWUI_PUBLIC_URL: "https://${OPENWEBUI_HOST}"

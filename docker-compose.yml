@@ -1,0 +1,64 @@
+# MirAI Agent Builder — Compose de dev local.
+#
+# Pré-requis : owuicore-main doit tourner (docker compose up -d dans ce repo).
+# Ce compose se branche sur le réseau externe `owui-net` pour parler à
+# openwebui, keycloak et postgres directement par leur nom de service.
+
+services:
+  agent-builder:
+    image: ${AGENT_BUILDER_IMAGE:-miraiku-agents:dev}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Cascade : le .env du socle fournit SCW_SECRET_KEY_LLM, SCW_LLM_BASE_URL,
+    # KEYCLOAK_*, etc. Notre .env local override ce qu'il faut (model, host,
+    # NEXTAUTH_SECRET, etc.). En Docker Compose, **le dernier env_file gagne**
+    # quand une variable est définie plusieurs fois, donc .env local en dernier.
+    env_file:
+      - ../owuicore-main/.env
+      - .env
+    environment:
+      # En dev local, OpenWebUI écoute sur http://openwebui:8080 (service Docker)
+      OWUI_BASE_URL: ${OWUI_BASE_URL:-http://openwebui:8080}
+      # Keycloak est exposé sur host.docker.internal depuis owuicore-main
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER_LOCAL:-http://host.docker.internal:8082/realms/openwebui}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3001}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://app:app@postgres:5432/agentbuilder?schema=public}
+    ports:
+      - "${AGENT_BUILDER_PORT:-3001}:3000"
+    networks:
+      - owui-net
+    depends_on:
+      - migrate
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  # Job one-shot de migration Prisma — joue prisma db push puis s'éteint.
+  # Utilise le stage `builder` (node_modules complet incluant le CLI prisma)
+  # plutôt que le runner minimaliste qui n'a que @prisma/client.
+  migrate:
+    image: miraiku-agents:migrator
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://app:app@postgres:5432/agentbuilder?schema=public}
+    # db push plutôt que migrate deploy tant que prisma/migrations/ est vide.
+    command: ["node_modules/.bin/prisma", "db", "push", "--accept-data-loss", "--skip-generate"]
+    networks:
+      - owui-net
+    restart: "no"
+
+networks:
+  # Réseau partagé avec owuicore-main (créé par son docker-compose.yml).
+  # En cas de lancement isolé, retirer "external: true" pour le créer localement.
+  owui-net:
+    external: true
+    name: owui-net

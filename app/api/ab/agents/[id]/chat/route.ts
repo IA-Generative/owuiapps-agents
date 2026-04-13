@@ -1,0 +1,117 @@
+// POST /api/ab/agents/:id/chat — chat avec un agent + persistance conversation
+// Si conversationId est fourni, on append. Sinon, on cree une nouvelle conversation.
+
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+import { scwChatCompletions, ScwLlmUnavailableError } from '@/lib/scw-llm-client';
+import { env } from '@/lib/env';
+
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
+  const agent = await prisma.agent.findUnique({
+    where: { id: params.id },
+    include: { versions: { orderBy: { version: 'desc' }, take: 1 } },
+  });
+  if (!agent) {
+    return NextResponse.json({ error: 'not_found' }, { status: 404 });
+  }
+
+  const snapshot = (agent.versions[0]?.configSnapshot ?? {}) as Record<string, unknown>;
+  const systemPrompt = (snapshot.systemPrompt as string) || 'Tu es un assistant.';
+  const modelId = (snapshot.modelId as string) || 'gpt-oss-120b';
+  const temperature = (snapshot.temperature as number) || 0.7;
+
+  const body = (await req.json().catch(() => ({}))) as {
+    messages?: Array<{ role: string; content: string }>;
+    conversationId?: string;
+  };
+
+  if (!Array.isArray(body.messages) || body.messages.length === 0) {
+    return NextResponse.json({ error: 'messages_required' }, { status: 400 });
+  }
+
+  // Appel LLM
+  let content: string;
+  try {
+    const completion = await scwChatCompletions({
+      model: modelId,
+      temperature,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...body.messages.map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        })),
+      ],
+    });
+    content = completion.choices?.[0]?.message?.content?.trim() ?? '';
+  } catch (err) {
+    if (err instanceof ScwLlmUnavailableError) {
+      return NextResponse.json({ error: 'llm_not_configured', detail: err.message }, { status: 501 });
+    }
+    return NextResponse.json({ error: 'upstream_failure', detail: String(err) }, { status: 502 });
+  }
+
+  // Persistance de la conversation
+  let conversationId = body.conversationId;
+  try {
+    const lastUserMsg = body.messages[body.messages.length - 1];
+    if (!conversationId) {
+      // Creer une nouvelle conversation
+      const conv = await prisma.conversation.create({
+        data: {
+          agentId: params.id,
+          userId: session.user.id,
+          title: lastUserMsg.content.slice(0, 80),
+        },
+      });
+      conversationId = conv.id;
+
+      // Persister tous les messages historiques
+      for (const m of body.messages) {
+        await prisma.conversationMessage.create({
+          data: {
+            conversationId,
+            role: m.role,
+            content: m.content,
+          },
+        });
+      }
+    } else {
+      // Append seulement le dernier message user
+      await prisma.conversationMessage.create({
+        data: {
+          conversationId,
+          role: lastUserMsg.role,
+          content: lastUserMsg.content,
+        },
+      });
+    }
+
+    // Toujours persister la reponse assistant
+    await prisma.conversationMessage.create({
+      data: {
+        conversationId,
+        role: 'assistant',
+        content,
+      },
+    });
+  } catch {
+    // Non-bloquant : si la persistance echoue, on renvoie quand meme la reponse
+  }
+
+  return NextResponse.json({
+    content,
+    conversationId,
+    owuiPublicUrl: env().OWUI_PUBLIC_URL || null,
+  });
+}

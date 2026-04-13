@@ -1,0 +1,9 @@
+# Namespace partagé avec le socle owuicore-main.
+# Ce manifeste est idempotent : si le namespace existe déjà (créé par le socle),
+# kubectl apply ne fait rien.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${NAMESPACE}
+  labels:
+    app.kubernetes.io/part-of: miraiku

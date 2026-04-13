@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+k8s/rendered
+coverage
+playwright-report
+test-results
+*.log
+.DS_Store
+__MACOSX
+prompt_mirai_agent_builder.md
+README.md
