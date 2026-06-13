@@ -48,6 +48,21 @@ export async function POST(
     return NextResponse.json({ error: 'messages_required' }, { status: 400 });
   }
 
+  // Whitelist stricte des roles : on n'accepte que user/assistant venant du
+  // client. Un message role:"system" injecte ici ecraserait le prompt de
+  // l'agent — on le filtre. On borne aussi le nombre de messages transmis.
+  const clientMessages = body.messages
+    .filter(
+      (m): m is { role: 'user' | 'assistant'; content: string } =>
+        (m?.role === 'user' || m?.role === 'assistant') &&
+        typeof m?.content === 'string',
+    )
+    .slice(-40);
+
+  if (clientMessages.length === 0) {
+    return NextResponse.json({ error: 'messages_required' }, { status: 400 });
+  }
+
   // Appel LLM
   let content: string;
   try {
@@ -56,10 +71,7 @@ export async function POST(
       temperature,
       messages: [
         { role: 'system', content: systemPrompt },
-        ...body.messages.map((m) => ({
-          role: m.role as 'user' | 'assistant',
-          content: m.content,
-        })),
+        ...clientMessages,
       ],
     });
     content = completion.choices?.[0]?.message?.content?.trim() ?? '';
@@ -73,7 +85,7 @@ export async function POST(
   // Persistance de la conversation
   let conversationId = body.conversationId;
   try {
-    const lastUserMsg = body.messages[body.messages.length - 1];
+    const lastUserMsg = clientMessages[clientMessages.length - 1];
     if (!conversationId) {
       // Creer une nouvelle conversation
       const conv = await prisma.conversation.create({
@@ -86,7 +98,7 @@ export async function POST(
       conversationId = conv.id;
 
       // Persister tous les messages historiques
-      for (const m of body.messages) {
+      for (const m of clientMessages) {
         await prisma.conversationMessage.create({
           data: {
             conversationId,

@@ -59,14 +59,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'messages_required' }, { status: 400 });
   }
 
+  // Whitelist des roles : seuls user/assistant venant du client sont admis.
+  // Empeche l'injection d'un message role:"system" qui detournerait le
+  // deroulement de l'onboarding. Borne aussi le nombre de tours.
+  const clientMessages = body.messages
+    .filter(
+      (m): m is { role: 'user' | 'assistant'; content: string } =>
+        (m?.role === 'user' || m?.role === 'assistant') &&
+        typeof m?.content === 'string',
+    )
+    .slice(-40);
+
+  if (clientMessages.length === 0) {
+    return NextResponse.json({ error: 'messages_required' }, { status: 400 });
+  }
+
   try {
     const completion = await scwChatCompletions({
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
-        ...body.messages.map((m) => ({
-          role: m.role as 'user' | 'assistant',
-          content: m.content,
-        })),
+        ...clientMessages,
       ],
       // mistral-small : rapide et bon pour le dialogue guide
       model: 'mistral-small-3.2-24b-instruct-2506',
