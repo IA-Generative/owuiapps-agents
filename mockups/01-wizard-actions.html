@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup 1 — Wizard Actions</title>
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/dsfr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/utility/utility.min.css">
+<style>
+  body { background: var(--background-default-grey); }
+  .mockup-wrapper { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+  .workflow-card { border: 1px solid var(--border-default-grey); border-radius: 8px; padding: 1.25rem; background: var(--background-default-grey-hover); }
+  .step-badge { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.8rem; color: var(--text-mention-grey); }
+</style>
+</head>
+<body>
+<header role="banner" class="fr-header">
+  <div class="fr-header__body">
+    <div class="fr-container">
+      <div class="fr-header__body-row">
+        <div class="fr-header__brand fr-enlarge-link">
+          <div class="fr-header__brand-top">
+            <div class="fr-header__logo">
+              <p class="fr-logo">République<br>Française</p>
+            </div>
+          </div>
+          <div class="fr-header__service">
+            <a href="/" title="Mes Agents MirAI">
+              <p class="fr-header__service-title">Mes Agents MirAI</p>
+            </a>
+            <p class="fr-header__service-tagline">Créez vos agents IA souverains</p>
+          </div>
+        </div>
+        <div class="fr-header__tools">
+          <div class="fr-header__tools-links">
+            <ul class="fr-btns-group">
+              <li><a class="fr-btn fr-btn--sm fr-icon-account-circle-line" href="#">Marie Dupont</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="mockup-wrapper">
+  <a class="fr-link fr-icon-arrow-left-line fr-link--icon-left fr-mb-3w" href="#">Retour aux agents</a>
+
+  <div class="fr-stepper fr-mb-4w">
+    <h2 class="fr-stepper__title">
+      <span class="fr-stepper__state">Étape 4 sur 5</span>
+      Automatisations navigateur
+    </h2>
+    <div class="fr-stepper__steps" data-fr-current-step="4" data-fr-steps="5"></div>
+  </div>
+
+  <div class="fr-callout fr-mb-4w">
+    <p class="fr-callout__text">
+      Cet agent peut exécuter des actions dans votre navigateur sur des sites spécifiques.
+      Choisissez comment créer votre workflow d'automatisation.
+    </p>
+  </div>
+
+  <div class="fr-grid-row fr-grid-row--gutters fr-mb-4w">
+    <div class="fr-col-12 fr-col-md-6">
+      <div class="fr-tile fr-tile--horizontal fr-enlarge-link" style="min-height:200px">
+        <div class="fr-tile__body">
+          <div class="fr-tile__content">
+            <h3 class="fr-tile__title"><a href="#">Enregistrer mes actions</a></h3>
+            <p class="fr-tile__desc">Naviguez sur le site cible, cliquez normalement. MirAI capture vos actions et crée le workflow automatiquement.</p>
+          </div>
+        </div>
+        <div class="fr-tile__header">
+          <div class="fr-tile__pictogram">
+            <span class="fr-icon-camera-line fr-icon--lg" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fr-col-12 fr-col-md-6">
+      <div class="fr-tile fr-tile--horizontal fr-enlarge-link" style="min-height:200px">
+        <div class="fr-tile__body">
+          <div class="fr-tile__content">
+            <h3 class="fr-tile__title"><a href="#">Écrire un workflow</a></h3>
+            <p class="fr-tile__desc">Décrivez les étapes en langage naturel ou en YAML (BSL). L'IA vous aide à structurer le workflow.</p>
+          </div>
+        </div>
+        <div class="fr-tile__header">
+          <div class="fr-tile__pictogram">
+            <span class="fr-icon-edit-line fr-icon--lg" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="fr-h5">Workflows enregistrés (1)</h3>
+
+  <div class="workflow-card fr-mb-3w">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+      <h4 class="fr-h6 fr-mb-0" style="margin:0">Extraire dossiers ANEF</h4>
+      <div style="display:flex; gap:0.5rem;">
+        <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">lecture seule</span>
+        <span class="fr-badge fr-badge--sm fr-badge--info">5 étapes</span>
+      </div>
+    </div>
+
+    <ul class="fr-mb-2w" style="list-style:none; padding:0; margin:0;">
+      <li style="padding:0.4rem 0; border-bottom:1px solid var(--border-default-grey);">
+        <span style="color:var(--text-default-success);">✓</span> 1. Attendre le tableau "Dossiers en attente"
+      </li>
+      <li style="padding:0.4rem 0; border-bottom:1px solid var(--border-default-grey);">
+        <span style="color:var(--text-default-success);">✓</span> 2. Extraire les colonnes ID, Nom, Date
+      </li>
+      <li style="padding:0.4rem 0; border-bottom:1px solid var(--border-default-grey);">
+        <span style="color:var(--text-default-warning);">⚠</span> 3. Demander confirmation à l'utilisateur
+      </li>
+      <li style="padding:0.4rem 0;">
+        <span style="color:var(--text-default-success);">✓</span> 4. Envoyer vers Grist "Stock"
+      </li>
+    </ul>
+
+    <p class="fr-text--xs fr-mb-2w" style="color:var(--text-mention-grey);">
+      Site autorisé : anef.interieur.gouv.fr
+    </p>
+
+    <div class="fr-btns-group fr-btns-group--inline fr-btns-group--sm">
+      <button class="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-play-line">Tester</button>
+      <button class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-edit-line">Modifier</button>
+      <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--icon-left fr-icon-delete-line">Supprimer</button>
+    </div>
+  </div>
+
+  <div class="fr-grid-row" style="justify-content:space-between;">
+    <button class="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-arrow-left-line">Précédent</button>
+    <button class="fr-btn fr-btn--icon-right fr-icon-arrow-right-line">Suivant</button>
+  </div>
+</main>
+</body>
+</html>

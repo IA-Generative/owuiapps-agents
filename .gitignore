@@ -1,3 +1,6 @@
+# Sorties locales sensibles (audit, homologation) — ne pas committer
+private/
+
 # --- Secrets ---
 .env
 .env.local

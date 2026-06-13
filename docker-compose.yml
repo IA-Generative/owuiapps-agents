@@ -50,8 +50,7 @@ services:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://app:app@postgres:5432/agentbuilder?schema=public}
-    # db push plutôt que migrate deploy tant que prisma/migrations/ est vide.
-    command: ["node_modules/.bin/prisma", "db", "push", "--accept-data-loss", "--skip-generate"]
+    command: ["node_modules/.bin/prisma", "migrate", "deploy"]
     networks:
       - owui-net
     restart: "no"

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup 3 — Panneau overlay</title>
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/dsfr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/utility/utility.min.css">
+<style>
+  body { margin: 0; background: #e8e8e8; font-family: Marianne, system-ui, sans-serif; min-height: 100vh; }
+  .fake-bg { position: fixed; inset: 0; background: #f0f0f0; opacity: 0.6; z-index: 0; padding: 2rem; }
+  .fake-bg-content { max-width: 700px; margin: 0 auto; }
+  .fake-bg h2 { color: #666; font-size: 1.1rem; }
+  .fake-bg table { width: 100%; border-collapse: collapse; }
+  .fake-bg th, .fake-bg td { padding: 0.5rem; border: 1px solid #ccc; font-size: 0.8rem; color: #888; }
+  .overlay-panel { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 340px; background: white; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.2); z-index: 100; overflow: hidden; }
+  .overlay-tabs { display: flex; border-bottom: 2px solid var(--border-default-grey); }
+  .overlay-tab { flex: 1; padding: 0.6rem; text-align: center; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: none; background: none; }
+  .overlay-tab.active { color: #000091; border-bottom: 2px solid #000091; margin-bottom: -2px; }
+  .overlay-body { padding: 1rem; max-height: 420px; overflow-y: auto; }
+  .status-dot { width: 8px; height: 8px; background: #18753c; border-radius: 50%; display: inline-block; }
+  .suggestion { border: 1px solid var(--border-default-grey); border-radius: 6px; padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer; transition: background 0.15s; }
+  .suggestion:hover { background: var(--background-default-grey-hover); }
+  .suggestion-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; }
+  .suggestion-desc { font-size: 0.78rem; color: var(--text-mention-grey); margin-bottom: 0.5rem; }
+  .tip-box { background: #f5f5fe; border-left: 3px solid #000091; border-radius: 0 6px 6px 0; padding: 0.75rem; margin-top: 0.75rem; }
+  .tip-title { font-size: 0.8rem; font-weight: 600; color: #000091; margin-bottom: 0.35rem; }
+  .tip-text { font-size: 0.78rem; color: var(--text-default-grey); line-height: 1.4; }
+  .overlay-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--border-default-grey); display: flex; justify-content: space-between; align-items: center; }
+</style>
+</head>
+<body>
+
+<div class="fake-bg">
+  <div class="fake-bg-content">
+    <div style="background:#000091; color:white; padding:0.8rem 1rem; margin-bottom:1rem; font-weight:bold;">ANEF — Dossiers en attente</div>
+    <table>
+      <tr><th>ID</th><th>Nom</th><th>Date</th><th>Statut</th></tr>
+      <tr><td>4501</td><td>DUPONT Marie</td><td>14/04</td><td>En cours</td></tr>
+      <tr><td>4502</td><td>MARTIN Jean</td><td>13/04</td><td>Nouveau</td></tr>
+      <tr><td>4503</td><td>BERNARD Sophie</td><td>12/04</td><td>Nouveau</td></tr>
+      <tr><td>4504</td><td>PETIT Lucas</td><td>11/04</td><td>En cours</td></tr>
+      <tr><td>4505</td><td>ROBERT Claire</td><td>10/04</td><td>Attente</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="overlay-panel">
+  <div class="overlay-tabs">
+    <button class="overlay-tab active">Actions</button>
+    <button class="overlay-tab">Historique</button>
+    <button class="overlay-tab">Apprendre</button>
+  </div>
+
+  <div class="overlay-body">
+    <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.75rem; font-size:0.8rem; color:var(--text-mention-grey);">
+      <span class="status-dot"></span> Connecte &middot; ANEF detecte
+    </div>
+
+    <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Suggestions pour cette page :</p>
+
+    <div class="suggestion">
+      <div class="suggestion-title">Extraire dossiers ANEF</div>
+      <div class="suggestion-desc">Recupere les 12 dossiers affiches vers Grist "Stock"</div>
+      <button class="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-play-line" style="font-size:0.75rem;">Lancer</button>
+    </div>
+
+    <div class="suggestion">
+      <div class="suggestion-title">Resumer cette page</div>
+      <div class="suggestion-desc">Synthese IA de la vue courante</div>
+      <button class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-play-line" style="font-size:0.75rem;">Lancer</button>
+    </div>
+
+    <div class="suggestion">
+      <div class="suggestion-title">Enregistrer une action</div>
+      <div class="suggestion-desc">Creer un nouveau workflow a partir de vos clics</div>
+      <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--icon-left fr-icon-camera-line" style="font-size:0.75rem;">Commencer</button>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-title">Le saviez-vous ?</div>
+      <div class="tip-text">Vous pouvez demander a un agent de pre-remplir un avis prefectoral a partir du dossier ANEF affiche. Essayez l'agent "Redacteur avis" dans le catalogue.</div>
+      <a href="#" style="font-size:0.75rem; display:inline-block; margin-top:0.35rem;">En savoir plus</a>
+    </div>
+  </div>
+
+  <div class="overlay-footer">
+    <button class="fr-btn fr-btn--sm fr-btn--secondary">Ouvrir Mes Agents MirAI</button>
+    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-settings-5-line" aria-label="Parametres"></button>
+  </div>
+</div>
+
+</body>
+</html>

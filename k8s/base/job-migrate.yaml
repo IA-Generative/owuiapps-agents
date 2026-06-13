@@ -1,5 +1,6 @@
-# Job one-shot exécuté avant chaque rollout : joue prisma migrate deploy
-# contre la base `agentbuilder` du Postgres du socle.
+# Job one-shot execute avant chaque rollout : joue prisma migrate deploy
+# (migrations SQL versionnees dans prisma/migrations/) contre la base
+# `agentbuilder` du Postgres du socle.
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -32,10 +33,12 @@ spec:
           # n'a que @prisma/client, pas le CLI — elle ne peut pas exécuter
           # `prisma db push`.
           image: ${AGENT_BUILDER_MIGRATOR_IMAGE}
-          imagePullPolicy: IfNotPresent
-          # db push tant que prisma/migrations/ est vide (scaffold).
-          # À basculer sur [migrate, deploy] avec la première migration.
-          command: ["node_modules/.bin/prisma", "db", "push", "--accept-data-loss", "--skip-generate"]
+          # Always : on redeploie souvent la meme balise ${IMAGE_TAG}=dev
+          # avec un digest different (rebuild apres modif de schema.prisma).
+          # IfNotPresent reutiliserait le vieux migrator cache sur le node
+          # et reecraserait la DB avec un schema obsolete.
+          imagePullPolicy: Always
+          command: ["node_modules/.bin/prisma", "migrate", "deploy"]
           envFrom:
             - secretRef:
                 name: agent-builder-secrets

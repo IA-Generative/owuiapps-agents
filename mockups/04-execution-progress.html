@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup 4 — Execution pas-a-pas</title>
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/dsfr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/utility/utility.min.css">
+<style>
+  body { margin: 0; background: #e8e8e8; font-family: Marianne, system-ui, sans-serif; min-height: 100vh; }
+  .exec-panel { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 340px; background: white; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.2); z-index: 100; overflow: hidden; }
+  .exec-header { background: #000091; color: white; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .exec-body { padding: 1rem; }
+  .progress-bar { height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; margin-bottom: 1rem; }
+  .progress-fill { height: 100%; background: #000091; border-radius: 3px; width: 50%; transition: width 0.5s; }
+  .step { display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0; }
+  .step:last-of-type { border-bottom: none; }
+  .step-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; margin-top: 2px; }
+  .step-icon.done { background: #18753c; color: white; }
+  .step-icon.active { background: #000091; color: white; animation: spin 1.5s linear infinite; }
+  @keyframes spin { 0%{opacity:1} 50%{opacity:0.4} 100%{opacity:1} }
+  .step-icon.pending { background: #e0e0e0; color: #999; }
+  .step-title { font-size: 0.85rem; font-weight: 500; }
+  .step-detail { font-size: 0.75rem; color: var(--text-mention-grey); margin-top: 2px; }
+  .exec-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--border-default-grey); display: flex; justify-content: center; gap: 0.5rem; }
+  .fake-bg { position: fixed; inset: 0; background: #f0f0f0; opacity: 0.5; z-index: 0; padding: 4rem 2rem; text-align: center; color: #aaa; font-size: 1.2rem; }
+</style>
+</head>
+<body>
+
+<div class="fake-bg">
+  <p>ANEF — Page en arriere-plan</p>
+  <p style="font-size:0.9rem;">(le workflow s'execute sur cette page)</p>
+</div>
+
+<div class="exec-panel">
+  <div class="exec-header">
+    <span class="fr-icon-play-line" aria-hidden="true" style="font-size:0.9rem;"></span>
+    <strong style="font-size:0.9rem;">Extraire dossiers ANEF</strong>
+  </div>
+
+  <div class="exec-body">
+    <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-mention-grey); margin-bottom:0.35rem;">
+      <span>Etape 2 sur 4</span>
+      <span>50%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+
+    <div class="step">
+      <div class="step-icon done">&#10003;</div>
+      <div>
+        <div class="step-title">1. Attendre le tableau</div>
+        <div class="step-detail">"Dossiers en attente" &mdash; trouve en 0.3s</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-icon active">&#9679;</div>
+      <div>
+        <div class="step-title">2. Extraire les colonnes</div>
+        <div class="step-detail">ID, Nom, Date &mdash; 12 lignes trouvees</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-icon pending">3</div>
+      <div>
+        <div class="step-title">3. Confirmation</div>
+        <div class="step-detail">"Envoyer 12 dossiers vers Grist ?"</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-icon pending">4</div>
+      <div>
+        <div class="step-title">4. Envoi vers Grist "Stock"</div>
+        <div class="step-detail">En attente</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exec-footer">
+    <button class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-stop-line" style="color:var(--text-default-error);">Arreter</button>
+    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--icon-left fr-icon-arrow-right-line">Passer cette etape</button>
+  </div>
+</div>
+
+</body>
+</html>

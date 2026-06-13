@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup 2 — Enregistrement en cours</title>
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/dsfr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/utility/utility.min.css">
+<style>
+  body { margin: 0; background: #f0f0f0; font-family: Marianne, system-ui, sans-serif; }
+  .recording-bar { background: var(--background-flat-error); color: white; padding: 0.6rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+  .recording-bar .pulse { width: 12px; height: 12px; background: white; border-radius: 50%; display: inline-block; margin-right: 0.5rem; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  .fake-app { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+  .fake-header { background: #000091; color: white; padding: 1rem 1.5rem; margin: -1.5rem -1.5rem 1.5rem; }
+  .highlight-row { background: rgba(0, 0, 145, 0.08) !important; outline: 2px dashed #000091; outline-offset: -1px; }
+  .capture-panel { position: fixed; bottom: 2rem; right: 2rem; width: 280px; background: white; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); padding: 1rem; z-index: 999; border-left: 4px solid #000091; }
+  .capture-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0; font-size: 0.85rem; }
+  .capture-item .icon { color: var(--text-default-success); font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #f5f5f5; text-align: left; padding: 0.6rem; font-size: 0.85rem; border-bottom: 2px solid #ddd; }
+  td { padding: 0.6rem; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<div class="recording-bar">
+  <div style="display:flex; align-items:center; gap:1rem;">
+    <span class="pulse"></span>
+    <strong>ENREGISTREMENT MIRAI EN COURS</strong>
+    <span style="opacity:0.8; font-size:0.85rem;">3 actions capturées</span>
+  </div>
+  <button style="background:white; color:var(--background-flat-error); border:none; padding:0.4rem 1rem; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;">Arreter l'enregistrement</button>
+</div>
+
+<div class="fake-app">
+  <div class="fake-header">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <strong style="font-size:1.1rem;">ANEF</strong>
+        <span style="opacity:0.7; margin-left:1rem; font-size:0.85rem;">Gestion des dossiers</span>
+      </div>
+      <nav style="display:flex; gap:1.5rem; font-size:0.85rem;">
+        <a href="#" style="color:white; text-decoration:none; opacity:0.7;">Accueil</a>
+        <a href="#" style="color:white; text-decoration:none; font-weight:bold;">Dossiers</a>
+        <a href="#" style="color:white; text-decoration:none; opacity:0.7;">Recherche</a>
+      </nav>
+    </div>
+  </div>
+
+  <h2 style="font-size:1.2rem; margin-bottom:1rem;">Dossiers en attente (12)</h2>
+
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Nom</th><th>Date</th><th>Statut</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>4501</td><td>DUPONT Marie</td><td>14/04/2026</td><td><span class="fr-badge fr-badge--sm fr-badge--info">En cours</span></td></tr>
+      <tr class="highlight-row"><td>4502</td><td>MARTIN Jean</td><td>13/04/2026</td><td><span class="fr-badge fr-badge--sm fr-badge--new">Nouveau</span></td></tr>
+      <tr><td>4503</td><td>BERNARD Sophie</td><td>12/04/2026</td><td><span class="fr-badge fr-badge--sm fr-badge--new">Nouveau</span></td></tr>
+      <tr><td>4504</td><td>PETIT Lucas</td><td>11/04/2026</td><td><span class="fr-badge fr-badge--sm fr-badge--info">En cours</span></td></tr>
+      <tr><td>4505</td><td>ROBERT Claire</td><td>10/04/2026</td><td><span class="fr-badge fr-badge--sm fr-badge--warning">En attente</span></td></tr>
+      <tr><td>4506</td><td>RICHARD Alain</td><td>09/04/2026</td><td><span class="fr-badge fr-badge--sm fr-badge--new">Nouveau</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="capture-panel">
+  <div style="font-weight:bold; margin-bottom:0.75rem; font-size:0.9rem; color:#000091;">MirAI a capture :</div>
+  <div class="capture-item"><span class="icon">&#10003;</span> Navigation vers /dossiers</div>
+  <div class="capture-item"><span class="icon">&#10003;</span> Clic sur "Dossiers"</div>
+  <div class="capture-item"><span class="icon">&#10003;</span> Extraction du tableau (6 lignes)</div>
+  <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid #eee; font-size:0.8rem; color:var(--text-mention-grey);">
+    Continuez vos actions sur le site...
+  </div>
+</div>
+
+</body>
+</html>

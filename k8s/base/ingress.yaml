@@ -7,6 +7,12 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "32m"
+    # NextAuth + Keycloak posent plusieurs cookies chiffres (state, pkce,
+    # csrf, callback-url) au signin. Le buffer nginx par defaut (4k) tronque
+    # les Set-Cookie, ce qui produit des "OAUTH_CALLBACK_ERROR state mismatch"
+    # au retour. 16k laisse de la marge.
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
 spec:
   ingressClassName: nginx
   tls:

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup 6 — Onglet Apprendre</title>
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/dsfr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/utility/utility.min.css">
+<style>
+  body { margin: 0; background: #e8e8e8; font-family: Marianne, system-ui, sans-serif; min-height: 100vh; }
+  .overlay-panel { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 340px; background: white; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.2); z-index: 100; overflow: hidden; }
+  .overlay-tabs { display: flex; border-bottom: 2px solid var(--border-default-grey); }
+  .overlay-tab { flex: 1; padding: 0.6rem; text-align: center; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--text-mention-grey); }
+  .overlay-tab.active { color: #000091; border-bottom: 2px solid #000091; margin-bottom: -2px; }
+  .overlay-body { padding: 1rem; max-height: 480px; overflow-y: auto; }
+  .section-title { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+  .parcours { border: 1px solid var(--border-default-grey); border-radius: 6px; padding: 0.6rem 0.75rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.6rem; }
+  .parcours-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; }
+  .parcours-icon.done { background: #18753c; color: white; }
+  .parcours-icon.ready { background: #000091; color: white; }
+  .parcours-icon.locked { background: #ce614a; color: white; }
+  .parcours-text { flex: 1; }
+  .parcours-title { font-size: 0.82rem; font-weight: 600; }
+  .parcours-meta { font-size: 0.72rem; color: var(--text-mention-grey); }
+  .parcours-btn { font-size: 0.72rem; background: #000091; color: white; border: none; padding: 0.25rem 0.6rem; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+  .parcours-btn.locked { background: #ce614a; }
+  .veille-item { padding: 0.35rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.78rem; line-height: 1.35; }
+  .veille-item:last-child { border: none; }
+  .veille-bullet { color: #000091; font-weight: bold; margin-right: 0.3rem; }
+  .badge-section { background: linear-gradient(135deg, #f5f5fe, #e3e3fd); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; text-align: center; }
+  .badge-icon { font-size: 1.8rem; }
+  .badge-level { font-size: 0.85rem; font-weight: 700; color: #000091; margin: 0.2rem 0; }
+  .badge-progress { font-size: 0.72rem; color: var(--text-mention-grey); }
+  .overlay-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--border-default-grey); display: flex; justify-content: space-between; align-items: center; }
+  .fake-bg { position: fixed; inset: 0; background: #f0f0f0; opacity: 0.4; z-index: 0; padding: 4rem 2rem; text-align: center; color: #bbb; font-size: 1rem; }
+</style>
+</head>
+<body>
+
+<div class="fake-bg">
+  <p>Application ministerielle en arriere-plan</p>
+</div>
+
+<div class="overlay-panel">
+  <div class="overlay-tabs">
+    <button class="overlay-tab">Actions</button>
+    <button class="overlay-tab">Historique</button>
+    <button class="overlay-tab active">Apprendre</button>
+  </div>
+
+  <div class="overlay-body">
+
+    <div class="section-title">Mes parcours</div>
+
+    <div class="parcours">
+      <div class="parcours-icon done">&#10003;</div>
+      <div class="parcours-text">
+        <div class="parcours-title">Mon premier agent</div>
+        <div class="parcours-meta">Termine le 14/04/2026 &middot; 3 min</div>
+      </div>
+    </div>
+
+    <div class="parcours">
+      <div class="parcours-icon ready">&#9654;</div>
+      <div class="parcours-text">
+        <div class="parcours-title">Ecrire un bon prompt</div>
+        <div class="parcours-meta">5 regles avec avant/apres &middot; 5 min</div>
+      </div>
+      <button class="parcours-btn">Commencer</button>
+    </div>
+
+    <div class="parcours">
+      <div class="parcours-icon locked">&#128274;</div>
+      <div class="parcours-text">
+        <div class="parcours-title">Securite et IA</div>
+        <div class="parcours-meta">Requis par votre direction</div>
+      </div>
+      <button class="parcours-btn locked">Obligatoire</button>
+    </div>
+
+    <div class="parcours">
+      <div class="parcours-icon ready">&#9654;</div>
+      <div class="parcours-text">
+        <div class="parcours-title">Comprendre les hallucinations</div>
+        <div class="parcours-meta">Quiz interactif &middot; 4 min</div>
+      </div>
+      <button class="parcours-btn">Commencer</button>
+    </div>
+
+    <div style="margin-top:1rem;"></div>
+    <div class="section-title">Veille IA (semaine 16)</div>
+
+    <div class="veille-item"><span class="veille-bullet">&bull;</span> <strong>Nouveau</strong> : agent Legifrance enrichi — croisement lois + jurisprudence</div>
+    <div class="veille-item"><span class="veille-bullet">&bull;</span> <strong>Cas d'usage</strong> : la prefecture du Rhone traite 200 courriers/jour avec MirAI</div>
+    <div class="veille-item"><span class="veille-bullet">&bull;</span> <strong>Culture</strong> : qu'est-ce qu'un RAG ? En 2 minutes.</div>
+
+    <div class="badge-section">
+      <div class="badge-icon">&#127941;</div>
+      <div class="badge-level">Niveau : Decouverte IA</div>
+      <div class="badge-progress">1 parcours sur 4 completes</div>
+      <div style="margin-top:0.4rem; height:4px; background:#ddd; border-radius:2px; overflow:hidden;">
+        <div style="width:25%; height:100%; background:#000091; border-radius:2px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="overlay-footer">
+    <button class="fr-btn fr-btn--sm fr-btn--secondary">Ouvrir Mes Agents MirAI</button>
+    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-settings-5-line" aria-label="Parametres"></button>
+  </div>
+</div>
+
+</body>
+</html>

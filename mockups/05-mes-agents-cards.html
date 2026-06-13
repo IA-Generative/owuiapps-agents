@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup 5 — Mes Agents (3 types)</title>
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/dsfr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/@gouvfr/dsfr@1.12.1/dist/utility/utility.min.css">
+<style>
+  body { background: var(--background-default-grey); }
+  .mockup-wrapper { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+  .agent-card { border: 1px solid var(--border-default-grey); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; height: 100%; min-height: 340px; background: white; }
+  .agent-card h3 { font-size: 1rem; line-height: 1.3; min-height: 2.6em; margin: 0 0 0.5rem; }
+  .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .meta { font-size: 0.75rem; color: var(--text-mention-grey); margin-bottom: 0.75rem; }
+  .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+  .card-actions .fr-btn { width: 100%; justify-content: center; }
+  .card-actions .hint { font-size: 0.72rem; color: var(--text-mention-grey); text-align: center; margin: 0; }
+</style>
+</head>
+<body>
+<header role="banner" class="fr-header">
+  <div class="fr-header__body">
+    <div class="fr-container">
+      <div class="fr-header__body-row">
+        <div class="fr-header__brand fr-enlarge-link">
+          <div class="fr-header__brand-top">
+            <div class="fr-header__logo"><p class="fr-logo">Republique<br>Francaise</p></div>
+          </div>
+          <div class="fr-header__service">
+            <a href="/"><p class="fr-header__service-title">Mes Agents MirAI</p></a>
+          </div>
+        </div>
+        <div class="fr-header__tools">
+          <div class="fr-header__tools-links">
+            <ul class="fr-btns-group">
+              <li><a class="fr-btn fr-btn--sm fr-icon-account-circle-line" href="#">Marie Dupont</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="mockup-wrapper">
+  <div class="fr-mb-4w">
+    <h1 class="fr-h3">Bienvenue, Marie Dupont</h1>
+    <p class="fr-text--lead" style="margin-bottom:0;">
+      Mes Agents MirAI vous permet de creer et partager vos propres agents IA souverains.
+    </p>
+  </div>
+
+  <h2 class="fr-h4">Mes agents (4)</h2>
+
+  <div class="fr-grid-row fr-grid-row--gutters">
+
+    <div class="fr-col-12 fr-col-md-6 fr-col-lg-3">
+      <div class="agent-card">
+        <h3>Redacteur de notes</h3>
+        <div class="badges">
+          <span class="fr-badge fr-badge--sm fr-badge--success">Publie</span>
+          <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">Communaute</span>
+          <span class="fr-badge fr-badge--sm" style="background:#e3e3fd;color:#000091;">Conversation</span>
+        </div>
+        <p class="meta">Version 3 &middot; 14/04/2026</p>
+        <div class="card-actions">
+          <a class="fr-btn fr-btn--icon-left fr-icon-chat-3-line" href="#">Utiliser dans MirAI Chat</a>
+          <p class="hint">Recherche web, outils avances</p>
+          <a class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left fr-icon-question-answer-line" href="#">Utiliser rapidement ici</a>
+          <div style="display:flex;justify-content:flex-end;margin-top:0.25rem;">
+            <a class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-btn--icon-left fr-icon-edit-line" href="#">Modifier</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fr-col-12 fr-col-md-6 fr-col-lg-3">
+      <div class="agent-card" style="border-left: 3px solid #ce614a;">
+        <h3>Extracteur ANEF</h3>
+        <div class="badges">
+          <span class="fr-badge fr-badge--sm fr-badge--success">Publie</span>
+          <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol">Prive</span>
+          <span class="fr-badge fr-badge--sm" style="background:#fee7e1;color:#ce614a;">Action</span>
+          <span class="fr-badge fr-badge--sm fr-badge--info">2 workflows</span>
+        </div>
+        <p class="meta">Version 1 &middot; 16/04/2026</p>
+        <div class="card-actions">
+          <a class="fr-btn fr-btn--icon-left fr-icon-play-line" href="#" style="background:#ce614a;">Lancer sur le site cible</a>
+          <p class="hint">Ouvre anef.interieur.gouv.fr et execute</p>
+          <a class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left fr-icon-edit-line" href="#">Modifier les workflows</a>
+          <div style="display:flex;justify-content:flex-end;margin-top:0.25rem;">
+            <a class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-btn--icon-left fr-icon-edit-line" href="#">Modifier</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fr-col-12 fr-col-md-6 fr-col-lg-3">
+      <div class="agent-card">
+        <h3>Veille juridique</h3>
+        <div class="badges">
+          <span class="fr-badge fr-badge--sm fr-badge--grey">Brouillon</span>
+          <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol">Prive</span>
+          <span class="fr-badge fr-badge--sm" style="background:#e3e3fd;color:#000091;">Conversation</span>
+        </div>
+        <p class="meta">Version 1 &middot; 15/04/2026</p>
+        <div class="card-actions">
+          <span class="fr-btn fr-btn--icon-left fr-icon-chat-3-line" style="width:100%;justify-content:center;opacity:0.5;pointer-events:none;" aria-disabled="true">Publiez pour utiliser</span>
+          <p class="hint">&nbsp;</p>
+          <a class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left fr-icon-question-answer-line" href="#">Utiliser rapidement ici</a>
+          <div style="display:flex;justify-content:flex-end;margin-top:0.25rem;">
+            <a class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-btn--icon-left fr-icon-edit-line" href="#">Modifier</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fr-col-12 fr-col-md-6 fr-col-lg-3">
+      <div class="agent-card" style="border-left: 3px solid #009081;">
+        <h3>/note-synthese</h3>
+        <div class="badges">
+          <span class="fr-badge fr-badge--sm fr-badge--success">Publie</span>
+          <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">Communaute</span>
+          <span class="fr-badge fr-badge--sm" style="background:#c8f4ee;color:#009081;">Prompt</span>
+          <span class="fr-badge fr-badge--sm" style="background:#f0f0f0;">/commande</span>
+        </div>
+        <p class="meta">Version 2 &middot; 10/04/2026</p>
+        <div class="card-actions">
+          <a class="fr-btn fr-btn--icon-left fr-icon-chat-3-line" href="#" style="background:#009081;">Utiliser dans MirAI Chat</a>
+          <p class="hint">Tapez /note-synthese dans un chat</p>
+          <a class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left fr-icon-clipboard-line" href="#">Copier la commande</a>
+          <div style="display:flex;justify-content:flex-end;margin-top:0.25rem;">
+            <a class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-btn--icon-left fr-icon-edit-line" href="#">Modifier</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</body>
+</html>
