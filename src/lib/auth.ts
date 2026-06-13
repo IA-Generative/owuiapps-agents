@@ -31,14 +31,13 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // On expose :
-      //  - user.id : le sub Keycloak (UUID) pour les inserts Prisma
-      //  - accessToken : pour le BFF qui proxifie vers OpenWebUI (pas client)
+      // On expose UNIQUEMENT user.id (sub Keycloak) cote client.
+      // L'access token Keycloak reste dans le JWT serveur (token) et n'est
+      // JAMAIS renvoye dans l'objet session, qui est lisible cote navigateur
+      // via /api/auth/session. Le BFF le lit via getToken() (next-auth/jwt).
       if (session.user && token.sub) {
         session.user.id = token.sub;
       }
-      (session as typeof session & { accessToken?: string }).accessToken =
-        token.accessToken as string | undefined;
       return session;
     },
   },

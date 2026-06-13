@@ -9,8 +9,9 @@
 // zéro appel réseau supplémentaire — on décode simplement le JWT.
 
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import { env } from '@/lib/env';
 
 type GroupEntry = {
   path: string;
@@ -44,14 +45,15 @@ function groupPathToEntry(path: string): GroupEntry {
   };
 }
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session) {
+export async function GET(req: NextRequest) {
+  // L'access token Keycloak n'est plus expose dans la session : on lit le
+  // JWT NextAuth cote serveur (depuis le cookie) via getToken().
+  const token = await getToken({ req, secret: env().NEXTAUTH_SECRET });
+  if (!token) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const accessToken = (session as typeof session & { accessToken?: string }).accessToken;
-  const rawGroups = decodeTokenGroups(accessToken);
+  const rawGroups = decodeTokenGroups(token.accessToken);
 
   if (rawGroups.length === 0) {
     // Pas d'erreur — l'utilisateur n'est dans aucun groupe, ou le mapper
