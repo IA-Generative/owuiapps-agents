@@ -79,7 +79,8 @@ export async function POST(
     if (err instanceof ScwLlmUnavailableError) {
       return NextResponse.json({ error: 'llm_not_configured', detail: err.message }, { status: 501 });
     }
-    return NextResponse.json({ error: 'upstream_failure', detail: String(err) }, { status: 502 });
+    console.error('chat upstream_failure', err);
+    return NextResponse.json({ error: 'upstream_failure' }, { status: 502 });
   }
 
   // Persistance de la conversation

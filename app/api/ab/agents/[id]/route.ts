@@ -97,10 +97,8 @@ export async function PUT(
 
     return NextResponse.json({ id: params.id, version: newVersion, status });
   } catch (err) {
-    return NextResponse.json(
-      { error: 'update_failed', detail: String(err) },
-      { status: 500 },
-    );
+    console.error('update_failed', err);
+    return NextResponse.json({ error: 'update_failed' }, { status: 500 });
   }
 }
 

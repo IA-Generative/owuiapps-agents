@@ -46,9 +46,7 @@ export async function POST(req: Request) {
         { status: 501 },
       );
     }
-    return NextResponse.json(
-      { error: 'upstream_failure', detail: String(err) },
-      { status: 502 },
-    );
+    console.error('assist upstream_failure', err);
+    return NextResponse.json({ error: 'upstream_failure' }, { status: 502 });
   }
 }

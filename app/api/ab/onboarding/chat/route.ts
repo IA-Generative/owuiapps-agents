@@ -107,9 +107,7 @@ export async function POST(req: Request) {
       agentConfig,
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: 'upstream_failure', detail: String(err) },
-      { status: 502 },
-    );
+    console.error('onboarding upstream_failure', err);
+    return NextResponse.json({ error: 'upstream_failure' }, { status: 502 });
   }
 }

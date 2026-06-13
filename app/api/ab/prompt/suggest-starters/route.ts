@@ -71,11 +71,11 @@ export async function POST(req: Request) {
     const raw = completion.choices?.[0]?.message?.content?.trim() ?? '';
     const parsed = parseStartersJson(raw);
     if (!parsed) {
+      console.error('suggest-starters parse_failed, raw output:', raw);
       return NextResponse.json(
         {
           error: 'parse_failed',
           detail: 'Le modèle n\'a pas renvoyé un JSON valide.',
-          raw,
         },
         { status: 502 },
       );
@@ -88,10 +88,8 @@ export async function POST(req: Request) {
         { status: 501 },
       );
     }
-    return NextResponse.json(
-      { error: 'upstream_failure', detail: String(err) },
-      { status: 502 },
-    );
+    console.error('suggest-starters upstream_failure', err);
+    return NextResponse.json({ error: 'upstream_failure' }, { status: 502 });
   }
 }
 

@@ -158,9 +158,7 @@ export async function POST(req: Request) {
       owuiCreated,
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: 'persistence_failure', detail: String(err) },
-      { status: 500 },
-    );
+    console.error('persistence_failure', err);
+    return NextResponse.json({ error: 'persistence_failure' }, { status: 500 });
   }
 }
