@@ -21,8 +21,11 @@ type GroupEntry = {
 function decodeTokenGroups(accessToken: string | undefined): string[] {
   if (!accessToken) return [];
   try {
-    // JWT = header.payload.signature — on décode le payload sans vérifier
-    // (trust : le token vient de NextAuth via Keycloak, signé par le realm)
+    // JWT = header.payload.signature. On décode le payload SANS vérifier la
+    // signature : c'est intentionnel et sûr ici car la source du token est de
+    // confiance — getToken() (appelé en amont) a déjà validé et déchiffré le
+    // JWT NextAuth, lui-même obtenu via le flux OIDC Keycloak. On ne lit donc
+    // que des claims déjà authentifiés, jamais un token fourni par le client.
     const payload = JSON.parse(
       Buffer.from(accessToken.split('.')[1], 'base64url').toString('utf-8'),
     );
