@@ -83,8 +83,18 @@ export async function POST(req: Request) {
       .replace(/^-+|-+$/g, '')
       .slice(0, 60) || 'agent';
 
-  const visibility = body.visibility ?? 'private';
-  const status = body.status ?? 'draft';
+  // Validation des enums : on n'accepte que des valeurs connues, defaut sur le
+  // niveau le plus restrictif. NOTE (a valider) : le droit de publier en
+  // community/ministry devra etre conditionne a l'appartenance au groupe
+  // Keycloak correspondant — non implemente ici.
+  const VISIBILITIES = ['private', 'community', 'ministry'] as const;
+  const STATUSES = ['draft', 'published', 'submitted'] as const;
+  const visibility = VISIBILITIES.includes(body.visibility as never)
+    ? (body.visibility as (typeof VISIBILITIES)[number])
+    : 'private';
+  const status = STATUSES.includes(body.status as never)
+    ? (body.status as (typeof STATUSES)[number])
+    : 'draft';
 
   // Snapshot complet de la config du wizard — servira à recréer l'état
   // exact du brouillon à l'édition et, plus tard, à appeler OpenWebUI.
