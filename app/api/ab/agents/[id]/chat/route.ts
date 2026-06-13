@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { scwChatCompletions, ScwLlmUnavailableError } from '@/lib/scw-llm-client';
+import { rateLimit, LLM_RATE_LIMIT } from '@/lib/rate-limit';
 import { env } from '@/lib/env';
 
 export async function POST(
@@ -15,6 +16,9 @@ export async function POST(
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+  if (!rateLimit(`chat:${session.user.id}`, LLM_RATE_LIMIT)) {
+    return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
   }
 
   const agent = await prisma.agent.findUnique({

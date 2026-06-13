@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { scwChatCompletions, ScwLlmUnavailableError } from '@/lib/scw-llm-client';
+import { rateLimit, LLM_RATE_LIMIT } from '@/lib/rate-limit';
 
 const OPTIMIZER_PROMPT = `Tu es un assistant qui réécrit des prompts système pour des
 agents IA ministériels. Améliore la clarté, la structure, ajoute des garde-fous si
@@ -16,6 +17,9 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+  if (!rateLimit(`optimize:${session.user?.id ?? 'anon'}`, LLM_RATE_LIMIT)) {
+    return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
   }
 
   const body = (await req.json().catch(() => ({}))) as { prompt?: string };

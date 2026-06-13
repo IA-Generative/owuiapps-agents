@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { scwChatCompletions } from '@/lib/scw-llm-client';
+import { rateLimit, LLM_RATE_LIMIT } from '@/lib/rate-limit';
 
 const SYSTEM_PROMPT = `Tu es l'assistant de creation d'agents IA du Ministere de l'Interieur.
 Tu guides un agent du ministere (utilisateur non technique) pour creer son propre agent IA.
@@ -49,6 +50,9 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+  if (!rateLimit(`onboarding:${session.user?.id ?? 'anon'}`, LLM_RATE_LIMIT)) {
+    return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
   }
 
   const body = (await req.json().catch(() => ({}))) as {

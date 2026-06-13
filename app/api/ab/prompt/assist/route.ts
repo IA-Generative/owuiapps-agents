@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { scwChatCompletions, ScwLlmUnavailableError } from '@/lib/scw-llm-client';
+import { rateLimit, LLM_RATE_LIMIT } from '@/lib/rate-limit';
 
 const SYSTEM_META_PROMPT = `Tu es un assistant qui aide un agent du Ministère de l'Intérieur
 à rédiger un prompt système pour son propre agent IA. Propose un prompt structuré, clair,
@@ -16,6 +17,9 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+  if (!rateLimit(`assist:${session.user?.id ?? 'anon'}`, LLM_RATE_LIMIT)) {
+    return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
   }
 
   const body = (await req.json().catch(() => ({}))) as {
