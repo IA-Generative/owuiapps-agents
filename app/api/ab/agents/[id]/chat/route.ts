@@ -25,6 +25,15 @@ export async function POST(
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
 
+  // Contrôle d'accès : seul le proprietaire, ou un agent publie et partage
+  // (community/ministry), peut etre instancie. On renvoie 404 (et non 403)
+  // pour ne pas confirmer l'existence d'un agent prive a un tiers.
+  const isOwner = agent.creatorId === session.user.id;
+  const isShared = agent.visibility !== 'private' && agent.status === 'published';
+  if (!isOwner && !isShared) {
+    return NextResponse.json({ error: 'not_found' }, { status: 404 });
+  }
+
   const snapshot = (agent.versions[0]?.configSnapshot ?? {}) as Record<string, unknown>;
   const systemPrompt = (snapshot.systemPrompt as string) || 'Tu es un assistant.';
   const modelId = (snapshot.modelId as string) || 'gpt-oss-120b';
