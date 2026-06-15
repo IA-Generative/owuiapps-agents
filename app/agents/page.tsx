@@ -9,7 +9,6 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { env } from '@/lib/env';
 import { OnboardingChat } from './_components/onboarding-chat';
-import { LogoutButton } from './_components/logout-button';
 
 type SearchParams = { saved?: string };
 
@@ -35,24 +34,6 @@ export default async function AgentsPage({
 
   return (
     <div>
-      {/* Barre compte : nom de l'utilisateur connecte + deconnexion */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          gap: '1rem',
-          flexWrap: 'wrap',
-          marginBottom: '1rem',
-        }}
-      >
-        <span className="fr-text--sm fr-mb-0" style={{ color: 'var(--text-mention-grey)' }}>
-          <span className="fr-icon-account-circle-line fr-mr-1v" aria-hidden="true" />
-          Connecté en tant que <strong>{displayName}</strong>
-        </span>
-        <LogoutButton />
-      </div>
-
       <div className="fr-mb-4w">
         <h1>Bienvenue, {displayName}</h1>
         <p className="fr-text--lead">

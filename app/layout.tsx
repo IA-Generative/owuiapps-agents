@@ -3,6 +3,9 @@
 
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { HeaderAccount } from './_components/header-account';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -11,7 +14,12 @@ export const metadata: Metadata = {
     "Créer, partager et utiliser des agents IA souverains pour les agents du Ministère de l'Intérieur",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const session = await getServerSession(authOptions);
+  const displayName = session?.user
+    ? session.user.name || session.user.email || 'agent'
+    : null;
+
   return (
     <html lang="fr" data-fr-scheme="system">
       <head>
@@ -49,6 +57,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     </p>
                   </div>
                 </div>
+                {displayName && (
+                  <div className="fr-header__tools">
+                    <div className="fr-header__tools-links">
+                      <HeaderAccount displayName={displayName} />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
