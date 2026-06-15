@@ -4,7 +4,26 @@
 
 import type { NextAuthOptions } from 'next-auth';
 import KeycloakProvider from 'next-auth/providers/keycloak';
+import type { JWT } from 'next-auth/jwt';
 import { env } from './env';
+
+// Déconnexion fédérée : termine la session SSO Keycloak (pas seulement le
+// cookie NextAuth) via l'endpoint RP-initiated logout, en back-channel.
+// Sans cela, un nouveau « Se connecter » re-loguerait automatiquement.
+async function keycloakEndSession(token: JWT): Promise<void> {
+  try {
+    const base = env().KEYCLOAK_ISSUER.replace(/\/$/, '');
+    const url = new URL(`${base}/protocol/openid-connect/logout`);
+    if (token.idToken) {
+      url.searchParams.set('id_token_hint', token.idToken);
+    } else {
+      url.searchParams.set('client_id', env().KEYCLOAK_CLIENT_ID);
+    }
+    await fetch(url.toString(), { signal: AbortSignal.timeout(5000) });
+  } catch (err) {
+    console.warn('Keycloak end-session logout failed', err);
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -27,6 +46,8 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at;
+        // Conservé pour la déconnexion fédérée Keycloak (id_token_hint).
+        token.idToken = account.id_token;
       }
       return token;
     },
@@ -39,6 +60,12 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub;
       }
       return session;
+    },
+  },
+  events: {
+    // Déclenché au signOut() NextAuth : on termine aussi la session Keycloak.
+    async signOut({ token }) {
+      await keycloakEndSession(token);
     },
   },
   pages: {
