@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: 'Mes Agents MirAI (beta)',
   description:
     "Créer, partager et utiliser des agents IA souverains pour les agents du Ministère de l'Intérieur",
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+  },
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
@@ -43,6 +46,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                         <br />
                         de l&apos;Intérieur
                       </p>
+                    </div>
+                    <div className="fr-header__operator">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="/favicon.svg"
+                        alt="Mes Agents MirAI"
+                        width={40}
+                        height={40}
+                        style={{ maxHeight: '40px', width: 'auto' }}
+                      />
                     </div>
                   </div>
                   <div className="fr-header__service">

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mes Agents MirAI">
+  <!-- Antenne -->
+  <line x1="32" y1="7" x2="32" y2="17" stroke="#000091" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="6" r="3.5" fill="#000091"/>
+  <!-- Oreilles / capteurs -->
+  <rect x="6" y="29" width="5" height="11" rx="2.5" fill="#000091"/>
+  <rect x="53" y="29" width="5" height="11" rx="2.5" fill="#000091"/>
+  <!-- Tête de l'agent -->
+  <rect x="12" y="17" width="40" height="35" rx="10" fill="#000091"/>
+  <!-- Yeux -->
+  <circle cx="24" cy="33" r="4.6" fill="#ffffff"/>
+  <circle cx="40" cy="33" r="4.6" fill="#ffffff"/>
+  <!-- Reflet « actif » -->
+  <circle cx="40" cy="33" r="2" fill="#6a6af4"/>
+  <!-- Bouche -->
+  <rect x="23" y="42" width="18" height="3.2" rx="1.6" fill="#ffffff" opacity="0.85"/>
+</svg>
