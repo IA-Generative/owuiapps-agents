@@ -55,6 +55,30 @@ export const AVAILABLE_MODELS: ModelProfile[] = [
     ],
   },
   {
+    id: 'gemma-4-26b-a4b-it',
+    label: 'Gemma 4 (26B, MoE 4B actif)',
+    family: 'Google',
+    tier: 'balanced',
+    shortPitch: 'Généraliste Google récent, architecture MoE efficace (rapide pour sa taille).',
+    strengths: [
+      'Bon rapport qualité / vitesse',
+      'MoE : 26B paramètres, ~4B activés par token → économe',
+      'Capacités générales récentes, multilingue correct',
+      'Bon défaut quand Mistral Small est un peu juste',
+    ],
+    tradeoffs: [
+      'Moins fort que les très grands modèles sur le raisonnement complexe',
+      'Français parfois moins idiomatique que Mistral',
+    ],
+    cost: 2,
+    latency: 4,
+    recommendedFor: [
+      'Tâches généralistes quotidiennes',
+      'Reformulation, résumé, questions-réponses',
+      'Agents polyvalents légers',
+    ],
+  },
+  {
     id: 'llama-3.3-70b-instruct',
     label: 'Llama 3.3 (70B)',
     family: 'Meta',
@@ -76,6 +100,30 @@ export const AVAILABLE_MODELS: ModelProfile[] = [
       'Rédaction de rapports, synthèses de dossiers',
       'Analyse de texte à longueur moyenne',
       'Agents polyvalents qui mélangent plusieurs tâches',
+    ],
+  },
+  {
+    id: 'qwen3.6-35b-a3b',
+    label: 'Qwen3.6 (35B, MoE 3B actif)',
+    family: 'Alibaba',
+    tier: 'balanced',
+    shortPitch: 'Généraliste Qwen récent, MoE économe, suivi d\'instructions fiable.',
+    strengths: [
+      'Architecture MoE efficiente (35B paramètres, ~3B activés)',
+      'Bonnes performances générales et multilingues',
+      'Suivi d\'instructions fiable',
+      'Gère les contextes longs',
+    ],
+    tradeoffs: [
+      'Français administratif un peu moins naturel que Mistral',
+      'Peut être verbeux',
+    ],
+    cost: 3,
+    latency: 3,
+    recommendedFor: [
+      'Agents polyvalents, alternative récente à Llama 3.3',
+      'Analyse et synthèse de documents',
+      'Tâches mêlant plusieurs langues',
     ],
   },
   {
@@ -104,26 +152,27 @@ export const AVAILABLE_MODELS: ModelProfile[] = [
     ],
   },
   {
-    id: 'deepseek-r1-distill-llama-70b',
-    label: 'DeepSeek-R1 Distill (70B)',
-    family: 'DeepSeek',
-    tier: 'reasoning',
-    shortPitch: 'Raisonnement distillé sur base Llama 70B — compromis puissance/vitesse.',
+    id: 'mistral-medium-3.5-128b',
+    label: 'Mistral Medium 3.5 (128B)',
+    family: 'Mistral AI',
+    tier: 'power',
+    shortPitch: 'Modèle haut de gamme de Mistral — excellent en français soutenu et en style contraint.',
     strengths: [
-      'Raisonnement chain-of-thought solide',
-      'Plus rapide que gpt-oss-120b à qualité comparable',
-      'Bon sur les problèmes logiques et arithmétiques',
+      'Très bonne qualité rédactionnelle en français',
+      'Suivi d\'instructions fin et nuancé (ton, format, style)',
+      'Bon compromis qualité / latence pour un grand modèle',
+      'Adapté aux tâches exigeantes (synthèse soignée, créativité)',
     ],
     tradeoffs: [
-      'Parfois trop verbeux (expose sa réflexion)',
-      'Moins créatif qu\'un modèle généraliste pour la rédaction libre',
+      'Consommation de tokens élevée',
+      'Plus lent que les modèles légers',
     ],
-    cost: 3,
-    latency: 3,
+    cost: 4,
+    latency: 2,
     recommendedFor: [
-      'Vérification de cohérence dans un dossier',
-      'Agents de contrôle qualité / relecture',
-      'Tâches logiques à étapes (éligibilité, calculs)',
+      'Rédaction soignée, contraintes de style ou de format',
+      'Notes à forte visibilité, synthèses de qualité',
+      'Agents généralistes premium',
     ],
   },
   {
@@ -202,6 +251,66 @@ export const AVAILABLE_MODELS: ModelProfile[] = [
 
 export function getModelById(id: string): ModelProfile | undefined {
   return AVAILABLE_MODELS.find((m) => m.id === id);
+}
+
+// Modèles non conversationnels à exclure du choix d'agent (embeddings, audio,
+// rerank…) : ils apparaissent dans GET /models mais ne savent pas dialoguer.
+const NON_CHAT_RE = /embedding|bge|rerank|whisper|voxtral|moderation|\btts\b|\bstt\b/i;
+
+export function isSelectableModel(id: string): boolean {
+  return !NON_CHAT_RE.test(id);
+}
+
+const FAMILY_BY_OWNER: Record<string, string> = {
+  mistral: 'Mistral AI',
+  meta: 'Meta',
+  google: 'Google',
+  qwen: 'Alibaba',
+  alibaba: 'Alibaba',
+  openai: 'OpenAI (open-source)',
+  deepseek: 'DeepSeek',
+  hcompany: 'H Company',
+  baai: 'BAAI',
+};
+
+function prettyFamily(owner?: string): string {
+  if (!owner) return 'Inconnu';
+  return FAMILY_BY_OWNER[owner.toLowerCase()] ?? owner;
+}
+
+// Profil minimal pour un modèle live qui n'a pas (encore) de fiche curated.
+function inferProfile(id: string, ownedBy?: string): ModelProfile {
+  return {
+    id,
+    label: id,
+    family: prettyFamily(ownedBy),
+    tier: 'balanced',
+    shortPitch:
+      "Modèle disponible sur l'instance souveraine. Fiche détaillée non encore renseignée.",
+    strengths: [],
+    tradeoffs: [],
+    cost: 3,
+    latency: 3,
+    recommendedFor: [],
+  };
+}
+
+// Fusionne la liste live (ce que Scaleway sert réellement) avec les fiches
+// curated. Les modèles curated encore disponibles gardent leur ordre et leur
+// description ; les nouveaux modèles live sont ajoutés à la suite avec un
+// profil minimal ; les modèles curated disparus de l'API ne sont PAS renvoyés
+// (évite de proposer un modèle qui renverrait une erreur upstream).
+export function mergeLiveModels(
+  live: Array<{ id: string; owned_by?: string }>,
+): ModelProfile[] {
+  const usable = live.filter((m) => isSelectableModel(m.id));
+  const liveIds = new Set(usable.map((m) => m.id));
+  const curated = AVAILABLE_MODELS.filter((m) => liveIds.has(m.id));
+  const curatedIds = new Set(curated.map((m) => m.id));
+  const extras = usable
+    .filter((m) => !curatedIds.has(m.id))
+    .map((m) => inferProfile(m.id, m.owned_by));
+  return [...curated, ...extras];
 }
 
 export const DEFAULT_MODEL_ID = 'mistral-small-3.2-24b-instruct-2506';

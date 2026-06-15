@@ -3,7 +3,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   AVAILABLE_MODELS,
   TIER_LABELS,
@@ -18,7 +18,43 @@ export function StepBehavior() {
   const [busy, setBusy] = useState<null | 'assist' | 'optimize' | 'starters'>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const selectedModel = getModelById(draft.modelId);
+  // Liste des modèles chargée dynamiquement depuis /api/ab/models (cache serveur).
+  // On part du catalogue statique pour un affichage immédiat, puis on remplace
+  // par la liste live en tâche de fond.
+  const [models, setModels] = useState<ModelProfile[]>(AVAILABLE_MODELS);
+  const [modelsLoading, setModelsLoading] = useState(false);
+  const [modelsSource, setModelsSource] = useState<string | null>(null);
+
+  const loadModels = useCallback(async (refresh = false) => {
+    setModelsLoading(true);
+    try {
+      const res = await fetch(`/api/ab/models${refresh ? '?refresh=1' : ''}`);
+      if (res.ok) {
+        const data = (await res.json()) as { models?: ModelProfile[]; source?: string };
+        if (Array.isArray(data.models) && data.models.length > 0) {
+          setModels(data.models);
+          setModelsSource(data.source ?? null);
+        }
+      }
+    } catch {
+      // on garde le catalogue statique déjà affiché
+    } finally {
+      setModelsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadModels(false);
+  }, [loadModels]);
+
+  // Le modèle sélectionné peut venir de la liste live ou (à défaut) du catalogue.
+  const selectedModel =
+    models.find((m) => m.id === draft.modelId) ?? getModelById(draft.modelId);
+  // Garantit que la valeur courante figure toujours comme option du select.
+  const options =
+    selectedModel && !models.some((m) => m.id === draft.modelId)
+      ? [selectedModel, ...models]
+      : models;
 
   async function callPromptBff(path: string, kind: 'assist' | 'optimize') {
     setBusy(kind);
@@ -240,30 +276,106 @@ Contraintes :
         </fieldset>
       </div>
 
-      {/* ---- Sélecteur de modèle de base ---- */}
+      {/* ---- Sélecteur de modèle de base (menu déroulant + détails) ---- */}
       <div className="fr-col-12">
-        <fieldset className="fr-fieldset">
-          <legend className="fr-fieldset__legend">
-            <span className="fr-fieldset__legend--regular">Modèle de base</span>
-            <span className="fr-hint-text">
-              Choisissez le moteur IA selon la nature des tâches. Les modèles « léger »
-              sont rapides et économes ; les modèles « raisonnement » ou « puissant »
-              sont plus précis mais plus lents.
-            </span>
-          </legend>
-          <div className="fr-fieldset__content">
-            {AVAILABLE_MODELS.map((m) => (
-              <ModelRadioCard
-                key={m.id}
-                model={m}
-                checked={m.id === draft.modelId}
-                onSelect={() => update({ modelId: m.id })}
-              />
-            ))}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1rem', flexWrap: 'wrap' }}>
+          <div className="fr-select-group" style={{ flex: 1, minWidth: '260px', marginBottom: 0 }}>
+            <label className="fr-label" htmlFor="model-select">
+              Modèle de base
+              <span className="fr-hint-text">
+                Choisissez le moteur IA. Les détails du modèle s&apos;affichent ci-dessous.
+              </span>
+            </label>
+            <select
+              className="fr-select"
+              id="model-select"
+              value={draft.modelId}
+              onChange={(e) => update({ modelId: e.target.value })}
+            >
+              {options.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label} — {TIER_LABELS[m.tier]} · {m.family}
+                </option>
+              ))}
+            </select>
           </div>
-        </fieldset>
+          <button
+            type="button"
+            className="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-refresh-line"
+            onClick={() => loadModels(true)}
+            disabled={modelsLoading}
+            title="Recharger la liste des modèles disponibles"
+          >
+            {modelsLoading ? 'Actualisation…' : 'Actualiser'}
+          </button>
+        </div>
+        <p className="fr-text--xs fr-mt-1w" style={{ color: 'var(--text-mention-grey)' }}>
+          {modelsLoading
+            ? 'Chargement de la liste des modèles disponibles…'
+            : modelsSource === 'live' || modelsSource === 'cache' || modelsSource === 'stale'
+              ? `${models.length} modèles disponibles sur l'instance souveraine.`
+              : 'Liste de secours (catalogue local) — instance momentanément injoignable.'}
+        </p>
       </div>
 
+      {/* ---- Détails du modèle sélectionné ---- */}
+      {selectedModel && (
+        <div className="fr-col-12">
+          <div className="fr-callout">
+            <h3
+              className="fr-callout__title"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}
+            >
+              {selectedModel.label}
+              <span className={`fr-badge fr-badge--sm ${TIER_COLORS[selectedModel.tier]}`}>
+                {TIER_LABELS[selectedModel.tier]}
+              </span>
+              <span
+                className="fr-text--sm"
+                style={{ color: 'var(--text-mention-grey)', fontWeight: 400 }}
+              >
+                {selectedModel.family}
+              </span>
+            </h3>
+            <p className="fr-callout__text">{selectedModel.shortPitch}</p>
+            <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
+              <span>
+                Vitesse : <Indicator value={selectedModel.latency} />
+              </span>
+              <span>
+                Coût tokens : <Indicator value={selectedModel.cost} />
+              </span>
+            </div>
+            {(selectedModel.strengths.length > 0 || selectedModel.tradeoffs.length > 0) && (
+              <div className="fr-grid-row fr-grid-row--gutters">
+                {selectedModel.strengths.length > 0 && (
+                  <div className="fr-col-12 fr-col-md-6">
+                    <p className="fr-text--sm fr-mb-1w"><strong>Points forts</strong></p>
+                    <ul className="fr-text--sm fr-mb-0">
+                      {selectedModel.strengths.map((s, i) => <li key={i}>{s}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {selectedModel.tradeoffs.length > 0 && (
+                  <div className="fr-col-12 fr-col-md-6">
+                    <p className="fr-text--sm fr-mb-1w"><strong>Limites</strong></p>
+                    <ul className="fr-text--sm fr-mb-0">
+                      {selectedModel.tradeoffs.map((t, i) => <li key={i}>{t}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+            {selectedModel.recommendedFor.length > 0 && (
+              <p className="fr-text--sm fr-mb-0 fr-mt-2w">
+                <strong>Recommandé pour</strong> : {selectedModel.recommendedFor.join(' · ')}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ---- Température ---- */}
       <div className="fr-col-12 fr-col-md-6">
         <label className="fr-label" htmlFor="temperature">
           Température (Précis ↔ Créatif) — {draft.temperature.toFixed(1)}
@@ -278,100 +390,6 @@ Contraintes :
           value={draft.temperature}
           onChange={(e) => update({ temperature: Number(e.target.value) })}
         />
-      </div>
-
-      {selectedModel && (
-        <div className="fr-col-12">
-          <div className="fr-callout">
-            <h3 className="fr-callout__title">Résumé : {selectedModel.label}</h3>
-            <p className="fr-callout__text">{selectedModel.shortPitch}</p>
-            <p className="fr-text--sm fr-mb-0">
-              <strong>Recommandé pour</strong> : {selectedModel.recommendedFor.join(' · ')}
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ModelRadioCard({
-  model,
-  checked,
-  onSelect,
-}: {
-  model: ModelProfile;
-  checked: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <div
-      className="fr-radio-rich"
-      style={{
-        border: checked
-          ? '2px solid var(--border-active-blue-france)'
-          : '1px solid var(--border-default-grey)',
-        borderRadius: '4px',
-        padding: '1rem',
-        marginBottom: '0.5rem',
-        cursor: 'pointer',
-      }}
-      onClick={onSelect}
-    >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-        <input
-          type="radio"
-          name="model"
-          value={model.id}
-          checked={checked}
-          onChange={onSelect}
-          style={{ marginTop: '0.25rem' }}
-        />
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <strong>{model.label}</strong>
-            <span className={`fr-badge fr-badge--sm ${TIER_COLORS[model.tier]}`}>
-              {TIER_LABELS[model.tier]}
-            </span>
-            <span className="fr-text--sm" style={{ color: 'var(--text-mention-grey)' }}>
-              {model.family}
-            </span>
-          </div>
-          <p className="fr-mt-1w fr-mb-1w">{model.shortPitch}</p>
-          <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.875rem' }}>
-            <span>
-              Vitesse : <Indicator value={model.latency} />
-            </span>
-            <span>
-              Coût tokens : <Indicator value={model.cost} />
-            </span>
-          </div>
-          {checked && (
-            <details className="fr-mt-2w">
-              <summary className="fr-text--sm" style={{ cursor: 'pointer' }}>
-                Plus de détails
-              </summary>
-              <div className="fr-mt-1w fr-text--sm">
-                <p className="fr-mb-1w">
-                  <strong>Points forts :</strong>
-                </p>
-                <ul className="fr-mb-2w">
-                  {model.strengths.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
-                <p className="fr-mb-1w">
-                  <strong>Limites :</strong>
-                </p>
-                <ul className="fr-mb-0">
-                  {model.tradeoffs.map((t, i) => (
-                    <li key={i}>{t}</li>
-                  ))}
-                </ul>
-              </div>
-            </details>
-          )}
-        </div>
       </div>
     </div>
   );

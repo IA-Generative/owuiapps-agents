@@ -35,6 +35,24 @@ export class ScwLlmUnavailableError extends Error {
   }
 }
 
+export async function scwListModels(): Promise<Array<{ id: string; owned_by?: string }>> {
+  const e = env();
+  if (!e.SCW_LLM_BASE_URL || !e.SCW_SECRET_KEY_LLM) {
+    throw new ScwLlmUnavailableError();
+  }
+  const url = `${e.SCW_LLM_BASE_URL.replace(/\/$/, '')}/models`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${e.SCW_SECRET_KEY_LLM}` },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Scaleway models ${res.status}: ${detail.slice(0, 300)}`);
+  }
+  const json = (await res.json()) as { data?: Array<{ id: string; owned_by?: string }> };
+  return json.data ?? [];
+}
+
 export async function scwChatCompletions(params: {
   messages: ChatMessage[];
   model?: string;
