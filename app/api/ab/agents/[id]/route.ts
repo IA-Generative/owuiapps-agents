@@ -28,9 +28,10 @@ async function requireOwner(agentId: string) {
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const r = await requireOwner(params.id);
+  const { id } = await params;
+  const r = await requireOwner(id);
   if (!r.ok) return r.res;
 
   const snapshot = r.agent.versions[0]?.configSnapshot ?? {};
@@ -50,9 +51,10 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const r = await requireOwner(params.id);
+  const { id } = await params;
+  const r = await requireOwner(id);
   if (!r.ok) return r.res;
 
   const body = await req.json().catch(() => ({}));
@@ -77,7 +79,7 @@ export async function PUT(
   try {
     await prisma.$transaction([
       prisma.agent.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           visibility,
           status,
@@ -87,7 +89,7 @@ export async function PUT(
       }),
       prisma.agentVersion.create({
         data: {
-          agentId: params.id,
+          agentId: id,
           version: newVersion,
           configSnapshot,
           changelog: body.changelog ?? 'Modification via le wizard',
@@ -95,7 +97,7 @@ export async function PUT(
       }),
     ]);
 
-    return NextResponse.json({ id: params.id, version: newVersion, status });
+    return NextResponse.json({ id, version: newVersion, status });
   } catch (err) {
     console.error('update_failed', err);
     return NextResponse.json({ error: 'update_failed' }, { status: 500 });
@@ -104,15 +106,16 @@ export async function PUT(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const r = await requireOwner(params.id);
+  const { id } = await params;
+  const r = await requireOwner(id);
   if (!r.ok) return r.res;
 
   await prisma.agent.update({
-    where: { id: params.id },
+    where: { id },
     data: { status: 'archived' },
   });
 
-  return NextResponse.json({ id: params.id, status: 'archived' });
+  return NextResponse.json({ id, status: 'archived' });
 }

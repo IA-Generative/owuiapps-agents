@@ -11,8 +11,9 @@ import { env } from '@/lib/env';
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
@@ -22,7 +23,7 @@ export async function POST(
   }
 
   const agent = await prisma.agent.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { versions: { orderBy: { version: 'desc' }, take: 1 } },
   });
   if (!agent) {
@@ -95,7 +96,7 @@ export async function POST(
       // Creer une nouvelle conversation
       const conv = await prisma.conversation.create({
         data: {
-          agentId: params.id,
+          agentId: id,
           userId: session.user.id,
           title: lastUserMsg.content.slice(0, 80),
         },
