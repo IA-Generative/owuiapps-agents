@@ -5,6 +5,8 @@ private/
 .env
 .env.local
 .env.*.local
+.env.bak*
+*.bak-*
 *.secret
 *.pem
 *.key
