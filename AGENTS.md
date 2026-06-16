@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-Contexte pour assistants de code (Claude Code, Cursor, Copilot). Pieges
+Contexte pour assistants de code (Cursor, Copilot, etc.). Pieges
 operationnels appris en incident, non derivables du code seul. **Pour la stack,
 le setup et le demarrage local, voir [README.md](README.md)** — ce fichier
 n'y revient pas.

@@ -50,7 +50,7 @@ coverage/
 playwright-report/
 test-results/
 
-# --- IDE / Claude Code ---
+# --- IDE / outils agents ---
 .vscode/
 .idea/
 .claude/

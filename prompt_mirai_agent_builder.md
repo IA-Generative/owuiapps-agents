@@ -22,7 +22,7 @@ Tu es un **coding assistant spécialisé** chargé de concevoir et développer *
 |--------|---------------|-------------------|
 | **GeniAL (Miraiken)** | Structure formulaire : nom, description, instructions, amorce, exemples de prompt, bibliothèques, modèle, paramètres avancés | Ajouter : tools, connecteurs SI, partage communautaire, assistant de rédaction du prompt |
 | **Gemini Gems** | Split Éditeur/Prévisualisation live, bouton "Optimiser" (réécriture du prompt par l'IA), upload de fichiers "Connaissances", outil par défaut | Ajouter : connecteurs métier, catalogue communautaire, granularité des permissions |
-| **Claude Projects** | Mémoire projet, instructions custom, fichiers de contexte persistants | Adapter au contexte ministériel multi-utilisateurs |
+| **Assistants à mémoire projet** | Mémoire projet, instructions custom, fichiers de contexte persistants | Adapter au contexte ministériel multi-utilisateurs |
 
 ---
 
