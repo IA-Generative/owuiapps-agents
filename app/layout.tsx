@@ -42,9 +42,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                   <div className="fr-header__brand-top">
                     <div className="fr-header__logo">
                       <p className="fr-logo">
-                        Ministère
+                        République
                         <br />
-                        de l&apos;Intérieur
+                        Française
                       </p>
                     </div>
                     <div className="fr-header__operator">
@@ -62,7 +62,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                     <a href="/" title="Accueil — Mes Agents MirAI">
                       <p className="fr-header__service-title">
                         Mes Agents MirAI{' '}
-                        <span className="fr-badge fr-badge--sm fr-badge--info">beta</span>
+                        <span className="fr-badge fr-badge--sm fr-badge--green-emeraude">Beta</span>
                       </p>
                     </a>
                     <p className="fr-header__service-tagline">
@@ -87,9 +87,34 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <footer className="fr-footer" role="contentinfo">
           <div className="fr-container">
             <div className="fr-footer__body">
-              <p className="fr-footer__content-desc">
-                Mes Agents MirAI — hébergé sur Cloud Pi Native, conforme DSFR et RGAA 4.1.
-              </p>
+              <div className="fr-footer__brand fr-enlarge-link">
+                <a href="/" title="Accueil — Mes Agents MirAI">
+                  <p className="fr-logo">
+                    République
+                    <br />
+                    Française
+                  </p>
+                </a>
+              </div>
+              <div className="fr-footer__content">
+                <p className="fr-footer__content-desc">
+                  Mes Agents MirAI — hébergé sur Cloud Pi Native, conforme DSFR et RGAA 4.1.
+                </p>
+              </div>
+            </div>
+            <div className="fr-footer__bottom">
+              <ul className="fr-footer__bottom-list">
+                <li className="fr-footer__bottom-item">
+                  <a className="fr-footer__bottom-link" href="#">
+                    Accessibilité : partiellement conforme
+                  </a>
+                </li>
+                <li className="fr-footer__bottom-item">
+                  <a className="fr-footer__bottom-link" href="#">
+                    Mentions légales
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </footer>
