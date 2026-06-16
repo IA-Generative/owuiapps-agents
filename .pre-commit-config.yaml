@@ -1,0 +1,8 @@
+# Garde-fous anti-leak — scan des secrets avant chaque commit.
+# Installation : pre-commit install
+# Scan ponctuel complet : pre-commit run --all-files
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
