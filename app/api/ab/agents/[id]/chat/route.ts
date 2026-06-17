@@ -8,6 +8,15 @@ import { prisma } from '@/lib/db';
 import { scwChatCompletions, ScwLlmUnavailableError } from '@/lib/scw-llm-client';
 import { rateLimit, LLM_RATE_LIMIT } from '@/lib/rate-limit';
 import { env } from '@/lib/env';
+import {
+  inspectInput,
+  inspectOutput,
+  judgeOutput,
+  hardenSystemPrompt,
+  makeCanary,
+  logGuardEvent,
+  DEFAULT_OUTPUT_POLICY_GOAL,
+} from '@/lib/prompt-guard';
 
 export async function POST(
   req: Request,
@@ -68,6 +77,25 @@ export async function POST(
     return NextResponse.json({ error: 'messages_required' }, { status: 400 });
   }
 
+  // Garde COUCHE 1 — inspection du dernier message utilisateur (injection
+  // markers + keylogger brut). Bloque avant tout appel LLM.
+  const lastUser = clientMessages[clientMessages.length - 1];
+  const inGuard = inspectInput(lastUser.content, 'user');
+  if (inGuard.blocked) {
+    logGuardEvent({
+      route: 'chat',
+      stage: 'input',
+      userId: session.user.id,
+      role: 'user',
+      signals: inGuard.signals,
+    });
+    return NextResponse.json({ error: 'blocked_input' }, { status: 422 });
+  }
+
+  // Garde COUCHE 2 — durcissement du system prompt + canari par requête.
+  const canary = makeCanary();
+  const hardenedSystem = hardenSystemPrompt(systemPrompt, canary);
+
   // Appel LLM
   let content: string;
   try {
@@ -75,7 +103,7 @@ export async function POST(
       model: modelId,
       temperature,
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: hardenedSystem },
         ...clientMessages,
       ],
     });
@@ -86,6 +114,31 @@ export async function POST(
     }
     console.error('chat upstream_failure', err);
     return NextResponse.json({ error: 'upstream_failure' }, { status: 502 });
+  }
+
+  // Garde COUCHE 3 — inspection de la SORTIE avant de la renvoyer/persister.
+  // Heuristiques (keylogger, fuite du canari) + LLM-juge inline (manipulation).
+  const outHeuristics = inspectOutput(content, { canary });
+  const judge = await judgeOutput({ goal: DEFAULT_OUTPUT_POLICY_GOAL, response: content });
+  const outSignals = [
+    ...outHeuristics.signals,
+    {
+      source: 'judge' as const,
+      complied: judge.complied,
+      reason: judge.reason,
+      severity: 'medium' as const,
+    },
+  ];
+  if (outSignals.some((s) => s.complied)) {
+    logGuardEvent({
+      route: 'chat',
+      stage: 'output',
+      userId: session.user.id,
+      role: 'user',
+      signals: outSignals,
+    });
+    // On ne renvoie NI ne persiste la réponse dangereuse (caviardage total).
+    return NextResponse.json({ error: 'blocked_output' }, { status: 422 });
   }
 
   // Persistance de la conversation

@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { inspectInput, logGuardEvent } from '@/lib/prompt-guard';
 
 async function requireOwner(agentId: string) {
   const session = await getServerSession(authOptions);
@@ -58,6 +59,25 @@ export async function PUT(
   if (!r.ok) return r.res;
 
   const body = await req.json().catch(() => ({}));
+
+  // Garde anti-supply-chain à l'édition : même contrôle qu'à la création.
+  const creatorContent = [
+    body.systemPrompt ?? '',
+    body.description ?? '',
+    body.greeting ?? '',
+    ...(Array.isArray(body.examples) ? body.examples : []),
+  ].join('\n\n');
+  const inGuard = inspectInput(creatorContent, 'system');
+  if (inGuard.blocked) {
+    logGuardEvent({
+      route: 'agents.update',
+      stage: 'input',
+      userId: r.session.user.id,
+      role: 'system',
+      signals: inGuard.signals,
+    });
+    return NextResponse.json({ error: 'blocked_input' }, { status: 422 });
+  }
 
   const newVersion = r.agent.version + 1;
   const visibility = body.visibility ?? r.agent.visibility;
